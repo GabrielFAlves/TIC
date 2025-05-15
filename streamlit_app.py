@@ -5,21 +5,20 @@ import matplotlib.pyplot as plt
 # Configurações da página
 st.set_page_config(page_title="MotionTech Solutions", layout="wide")
 
-# Estilo: Centraliza e destaca o título
+# Título centralizado
 st.markdown("""
     <h1 style="text-align: center; color: #2E86C1;">📌 MotionTech Solutions</h1>
     <h3 style="text-align: center; color: #566573;">Plano Estratégico 2025</h3>
     <hr>
 """, unsafe_allow_html=True)
 
-# Menu lateral de navegação
+# Navegação lateral
 menu = st.sidebar.radio("📂 Seções", [
     "Cenário da Empresa",
     "Objetivos Estratégicos",
-    "Iniciativas, KPIs e Metas",
+    "Iniciativas, KPIs e Metas SMART",
     "Papel da TI",
-    "Balanced Scorecard",
-    "Simulador de Desempenho"
+    "Indicadores & Simulador"
 ])
 
 # Seção 1: Cenário da Empresa
@@ -51,7 +50,7 @@ elif menu == "Objetivos Estratégicos":
     }))
 
 # Seção 3: Iniciativas, KPIs e Metas SMART
-elif menu == "Iniciativas, KPIs e Metas":
+elif menu == "Iniciativas, KPIs e Metas SMART":
     st.header("📊 Iniciativas, KPIs e Metas SMART")
     categorias = {
         "Financeira": [
@@ -88,35 +87,45 @@ elif menu == "Papel da TI":
     - **Decisões Baseadas em Dados (BI, Analytics):** Estratégia guiada por dados.
     """)
 
-# Seção 5: Balanced Scorecard - Exemplo de Indicador
-elif menu == "Balanced Scorecard":
-    st.header("📈 Indicador: Novos Clientes B2B")
+# Seção 5: Indicadores + Simulador
+elif menu == "Indicadores & Simulador":
+    st.header("📈 Indicador Estratégico: Novos Clientes B2B")
     st.markdown("""
     **🎯 Objetivo:** Ampliar a base de clientes B2B  
-    **Fórmula:** Novos contratos B2B - Cancelamentos  
-    **Meta SMART:** Aumentar 40% até dez/2025  
-    **Limiares:**  
-    🟢 ≥ 3,5% ao mês | 🟡 2%-3,4% | 🔴 < 2%  
+    **🧮 Fórmula de Cálculo:** Novos contratos B2B ativos - Cancelamentos  
+    **📏 Unidade de Medida:** Número absoluto  
+    **📅 Frequência de Coleta:** Mensal  
+    **🎯 Meta SMART:** Aumentar 40% até dez/2025  
+    **📶 Limiares:**  
+    - 🟢 ≥ 3,5% ao mês  
+    - 🟡 2% - 3,4%  
+    - 🔴 < 2%
     """)
-
-# Seção 6: Simulador de Desempenho
-elif menu == "Simulador de Desempenho":
+    
+    st.divider()
+    
+    # Simulador de Desempenho
     st.header("🧪 Simulador de Desempenho: Novos Clientes B2B")
 
+    # Entrada meta 2024
     meta_2024 = st.number_input("Novos clientes B2B em 2024:", min_value=1, value=100)
     meta_2025 = int(meta_2024 * 1.4)
     st.markdown(f"🎯 **Meta 2025:** {meta_2025} novos clientes")
 
+    # Entradas por mês
     meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
     dados = {mes: st.number_input(f"Novos clientes em {mes}:", min_value=0) for mes in meses}
 
+    # Cálculo progresso
     df = pd.DataFrame.from_dict(dados, orient='index', columns=['Clientes'])
     df['Acumulado'] = df['Clientes'].cumsum()
     df['% da Meta'] = (df['Acumulado'] / meta_2025 * 100).round(1)
 
+    # Cores
     def cor(valor): return 'green' if valor >= 40 else 'orange' if valor >= 20 else 'red'
     cores = df['% da Meta'].apply(cor)
 
+    # Gráfico de progresso
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.bar(df.index, df['% da Meta'], color=cores)
     ax.axhline(40, color='blue', linestyle='--', label='Meta 40%')
@@ -125,6 +134,7 @@ elif menu == "Simulador de Desempenho":
     ax.legend()
     st.pyplot(fig)
 
+    # Status final
     status_final = df['% da Meta'].iloc[-1]
     if status_final >= 40:
         st.success(f"🟢 Excelente! {status_final}% da meta alcançada.")
